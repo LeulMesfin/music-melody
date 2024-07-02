@@ -17,6 +17,7 @@ import { FormCard } from './layoutParts'
 import * as WebBrowser from 'expo-web-browser';
 import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
 import React from 'react';
+import { Platform } from 'react-native'; // can delete
 
 /** simulate signin */
 function useSignIn() {
@@ -44,6 +45,16 @@ const discovery = {
 /** ------ EXAMPLE ------ */
 export function SignInScreen({ onSignIn }) {
   const { signIn, status } = useSignIn()
+
+  console.log("SignInScreen rendering");
+  const redirectUri = Platform.select({
+    web: 'http://localhost:8081/two', 
+    default: makeRedirectUri({
+      scheme: 'music-melody'
+    }),
+  });
+
+  // spotify auth
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: '051796be52404c759b36f84ac451e295',
@@ -51,24 +62,52 @@ export function SignInScreen({ onSignIn }) {
       // To follow the "Authorization Code Flow" to fetch token after authorizationEndpoint
       // this must be set to false
       usePKCE: false,
-      redirectUri: makeRedirectUri({
-        scheme: 'music-melody'
-      }),
+      redirectUri: redirectUri,//makeRedirectUri({
+        //scheme: 'music-melody'
+     // }),
     },
     discovery);
 
+    // Add this line to log the redirectUri
+    // console.log('Redirect URI:', request?.redirectUri);
+    // console.log("pizzaw")
+
+    // can delete later: for testing
     React.useEffect(() => {
       if (response?.type === 'success') {
         const { code } = response.params;
+        console.log(response.error);
+        console.log(code);
       }
     }, [response]);
   
-  const handleSignIn = async () => {
-    await signIn();
-    if (status === 'success') {
-      onSignIn();
+  // dont need
+//   const handleSignIn = async () => {
+//     await signIn();
+//     if (status === 'success') {
+//       onSignIn();
+//     }
+//   };
+
+  // I created this
+    const spotifyAuth = async () => {
+        console.log("Button is pressed - spotifyAuth function called");
+        try {
+            const res = await promptAsync();
+            console.log("Inside Try-catch");
+            if (res.type === 'success') {
+                // you authenticated successfully
+                const { code } = res.params;
+                console.log('Authentication successful. Code:', code);
+                onSignIn(); // successful signin
+            } else {
+                console.log("Auth failed or was cancelled!")
+            }
+        } catch(error) {
+            console.error('An error occurred during authentication:', error);
+        }
+        console.log("After the Try Catch");
     }
-  };
 
   return (
     <FormCard>
@@ -77,7 +116,7 @@ export function SignInScreen({ onSignIn }) {
         alignItems="stretch"
         minWidth="100%"
         maxWidth="100%"
-        gap="$4"
+        gap="$18" // gap between h1 and btn
         padding="$4"
         paddingVertical="$6"
         $gtSm={{
@@ -86,24 +125,25 @@ export function SignInScreen({ onSignIn }) {
         }}
       >
         <H1
+          marginTop="$11" 
           alignSelf="center"
           size="$8"
           $xs={{
-            size: '$7',
+            size: '$10',
           }}
         >
-          Sign in to your account
+          Music Scout
         </H1>
         <View flexDirection="column" gap="$3">
-          <View flexDirection="column" gap="$1">
+          {/* <View flexDirection="column" gap="$1">
             <Input size="$4">
               <Input.Label htmlFor="email">Email</Input.Label>
               <Input.Box>
                 <Input.Area id="email" placeholder="email@example.com" />
               </Input.Box>
             </Input>
-          </View>
-          <View flexDirection="column" gap="$1">
+          </View> */}
+          {/* <View flexDirection="column" gap="$1">
             <Input size="$4">
               <View
                 flexDirection="row"
@@ -122,9 +162,9 @@ export function SignInScreen({ onSignIn }) {
                 />
               </Input.Box>
             </Input>
-          </View>
+          </View> */}
         </View>
-        <Theme inverse>
+        {/* <Theme inverse>
           <Button
             disabled={status === 'loading'}
             onPress={handleSignIn}
@@ -155,7 +195,7 @@ export function SignInScreen({ onSignIn }) {
           >
             <Button.Text>Sign In</Button.Text>
           </Button>
-        </Theme>
+        </Theme> */}
         <View flexDirection="column" gap="$3" width="100%" alignItems="center">
           <Theme>
             <View
@@ -165,24 +205,26 @@ export function SignInScreen({ onSignIn }) {
               alignSelf="center"
               alignItems="center"
             >
-              <View flexDirection="row" width="100%" alignItems="center" gap="$4">
+              {/* <View flexDirection="row" width="100%" alignItems="center" gap="$4">
                 <Separator />
                 <Paragraph>Or</Paragraph>
                 <Separator />
-              </View>
+              </View> */}
               <View flexDirection="row" flexWrap="wrap" gap="$3">
               <Button
                 flex={1}
                 minWidth="100%"
-                disabled={!request}
-                onPress={() => {
-                  promptAsync();
-                }}>
+                size="$6"
+                variant="outlined"
+                backgroundColor="black"
+                color="white"
+                disabled={false}//{!request}
+                onPress={spotifyAuth}>
                     <Button.Icon>
-                        <FontAwesome name="spotify" size={24} color="black" />
+                        <FontAwesome name="spotify" size={24} color="green" />
                     </Button.Icon>
                     <Button.Text>Continue with Spotify</Button.Text>
-                </Button>
+              </Button>
                 {/* <Button flex={1} minWidth="100%">
                   <Button.Icon>
                     <FontAwesome name="spotify" size={24} color="black" />
@@ -193,7 +235,7 @@ export function SignInScreen({ onSignIn }) {
             </View>
           </Theme>
         </View>
-        <SignUpLink />
+        {/* <SignUpLink /> */}
       </View>
     </FormCard>
   )
