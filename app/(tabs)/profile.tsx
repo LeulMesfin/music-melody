@@ -1,6 +1,24 @@
 import { Text, View, H1, YStack, H2, Avatar, XStack, Button } from 'tamagui'
 import React from 'react'
 
+/* This function makes a DELETE request to my express API 
+ * hosted on Vercel. This function will send a request to
+ * the API which then communicates with the MongoDB database
+ * to delete a specified user from the database. */
+async function deleteUser(data): Promise<any> {
+    try {
+      const result = await fetch("https://music-app-api-sand.vercel.app/users", {
+        method: "POST", headers: {'Content-Type': 'application/json' }, body: JSON.stringify(data)
+      });
+      return await result.json();
+    } catch (error) {
+      console.error('Detailed error:', error);
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
+  }
+
 export default function ProfileScreen() {
   return (
     <YStack f={1} gap="$12" pt="$7" ai="center">

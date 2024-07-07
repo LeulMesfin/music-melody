@@ -15,11 +15,12 @@ import {
 import { Input } from './inputParts'
 import { FormCard } from './layoutParts'
 import * as WebBrowser from 'expo-web-browser';
-import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
+import { makeRedirectUri, ResponseType, TokenResponse, useAuthRequest } from 'expo-auth-session';
 import React from 'react';
 import { Platform } from 'react-native'; // can delete
 
 /** simulate signin */
+// can delete
 function useSignIn() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle')
   return {
@@ -33,6 +34,38 @@ function useSignIn() {
   }
 }
 
+/* This function makes a GET request to the Spotify Web API
+ * It returns a logged in User's profile info. */
+async function fetchProfile(token: string): Promise<any> {
+  try {
+    const result = await fetch("https://api.spotify.com/v1/me", {
+      method: "GET", headers: { Authorization: `Bearer ${token}` }
+    });
+    return await result.json();
+  } catch (error) {
+    console.log('Error fetching user info:', error);
+  }
+}
+
+/* This function makes a POST request to my express API 
+ * hosted on Vercel. This function will send a request to
+ * the API which then communicates with the MongoDB database
+ * to insert a new user to the database. */
+async function postUser(data): Promise<any> {
+  try {
+    const result = await fetch("https://music-app-api-sand.vercel.app/users", {
+      method: "POST", headers: {'Content-Type': 'application/json' }, body: JSON.stringify(data)
+    });
+    return await result.json();
+  } catch (error) {
+    console.error('Detailed error:', error);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+  }
+}
+
+
 WebBrowser.maybeCompleteAuthSession();
 
 // Endpoint
@@ -45,68 +78,50 @@ const discovery = {
 /** ------ EXAMPLE ------ */
 export function SignInScreen({ onSignIn }) {
   const { signIn, status } = useSignIn()
+  const [token, setToken] = useState("")
 
-  console.log("SignInScreen rendering");
-  const redirectUri = Platform.select({
-    web: 'http://localhost:8081/two', 
-    default: makeRedirectUri({
-      scheme: 'music-melody'
-    }),
-  });
-
+  // console.log("SignInScreen rendering");
+ 
   // spotify auth
   const [request, response, promptAsync] = useAuthRequest(
     {
+      responseType: ResponseType.Token,
       clientId: '051796be52404c759b36f84ac451e295',
       scopes: ['user-read-email', 'playlist-modify-public'],
       // To follow the "Authorization Code Flow" to fetch token after authorizationEndpoint
       // this must be set to false
       usePKCE: false,
-      redirectUri: redirectUri,//makeRedirectUri({
-        //scheme: 'music-melody'
-     // }),
+      redirectUri: makeRedirectUri({
+        scheme: 'music-melody'
+     }),
     },
     discovery);
 
-    // Add this line to log the redirectUri
-    // console.log('Redirect URI:', request?.redirectUri);
-    // console.log("pizzaw")
-
-    // can delete later: for testing
-    React.useEffect(() => {
-      if (response?.type === 'success') {
-        const { code } = response.params;
-        console.log(response.error);
-        console.log(code);
-      }
-    }, [response]);
-  
-  // dont need
-//   const handleSignIn = async () => {
-//     await signIn();
-//     if (status === 'success') {
-//       onSignIn();
-//     }
-//   };
-
-  // I created this
+    console.log('Redirect URI:', request?.redirectUri); // for testing
+    
+    /* Implicit-flow: this method has inherent security risks,
+     * for better security, I can transition this to auth code with PKCE
+     *  more info: https://docs.expo.dev/guides/authentication/#improving-user-experience */
     const spotifyAuth = async () => {
-        console.log("Button is pressed - spotifyAuth function called");
+      console.log("Button is pressed - spotifyAuth function called");
         try {
             const res = await promptAsync();
-            console.log("Inside Try-catch");
-            if (res.type === 'success') {
-                // you authenticated successfully
-                const { code } = res.params;
-                console.log('Authentication successful. Code:', code);
-                onSignIn(); // successful signin
-            } else {
-                console.log("Auth failed or was cancelled!")
+            if (res && res.type === 'success') {
+              const token = res.params.access_token;
+              console.log("token: ", token);
+              const profile = await fetchProfile(token);
+              console.log("profile: ", profile);
+              const data = {
+                "email": profile.email,
+                "playlists": [] // leave empty for now...
+              };
+              console.log(data);
+              postUser(data);
+              onSignIn(); // changes app screen
             }
         } catch(error) {
             console.error('An error occurred during authentication:', error);
         }
-        console.log("After the Try Catch");
     }
 
   return (
