@@ -17,7 +17,9 @@ import { FormCard } from './layoutParts'
 import * as WebBrowser from 'expo-web-browser';
 import { makeRedirectUri, ResponseType, TokenResponse, useAuthRequest } from 'expo-auth-session';
 import React from 'react';
-import { Platform } from 'react-native'; // can delete
+import { Platform } from 'react-native'; // can delete 
+import { storeToken } from 'app/tokenLayout';
+import { useEmailContext } from 'app/components/EmailComponent';
 
 /** simulate signin */
 // can delete
@@ -44,6 +46,7 @@ async function fetchProfile(token: string): Promise<any> {
     return await result.json();
   } catch (error) {
     console.log('Error fetching user info:', error);
+    throw error;
   }
 }
 
@@ -59,34 +62,30 @@ async function postUser(data): Promise<any> {
     return await result.json();
   } catch (error) {
     console.error('Detailed error:', error);
-    console.error('Error name:', error.name);
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
+    throw error;
   }
 }
 
-
 WebBrowser.maybeCompleteAuthSession();
+const MY_SECURE_AUTH_STATE_KEY = '';
 
 // Endpoint
 const discovery = {
-    authorizationEndpoint: 'https://accounts.spotify.com/authorize',
-    tokenEndpoint: 'https://accounts.spotify.com/api/token',
-  };
+  authorizationEndpoint: 'https://accounts.spotify.com/authorize',
+  tokenEndpoint: 'https://accounts.spotify.com/api/token',
+};
   
 
 /** ------ EXAMPLE ------ */
 export function SignInScreen({ onSignIn }) {
-  const { signIn, status } = useSignIn()
-  const [token, setToken] = useState("")
-
-  // console.log("SignInScreen rendering");
+  const { email, setEmail } = useEmailContext();
+  // const { signIn, status } = useSignIn();
  
   // spotify auth
   const [request, response, promptAsync] = useAuthRequest(
     {
       responseType: ResponseType.Token,
-      clientId: '051796be52404c759b36f84ac451e295',
+      clientId: process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID!,
       scopes: ['user-read-email', 'playlist-modify-public'],
       // To follow the "Authorization Code Flow" to fetch token after authorizationEndpoint
       // this must be set to false
@@ -105,20 +104,25 @@ export function SignInScreen({ onSignIn }) {
     const spotifyAuth = async () => {
       console.log("Button is pressed - spotifyAuth function called");
         try {
-            const res = await promptAsync();
-            if (res && res.type === 'success') {
-              const token = res.params.access_token;
-              console.log("token: ", token);
-              const profile = await fetchProfile(token);
-              console.log("profile: ", profile);
-              const data = {
+          const res = await promptAsync();
+          if (res && res.type === 'success') {
+            const token = res.params.access_token;
+            if (Platform.OS !== 'web') {
+              // Securely store the auth on your device using secure storage
+              storeToken(token);
+            }
+            const profile = await fetchProfile(token);
+            console.log("profile: ", profile);
+            setEmail(profile.email)
+            const data = {
                 "email": profile.email,
                 "playlists": [] // leave empty for now...
-              };
-              console.log(data);
-              postUser(data);
-              onSignIn(); // changes app screen
-            }
+            };
+            console.log(data);
+            postUser(data); // post user to DB
+            onSignIn(); // changes app screen
+            
+          }
         } catch(error) {
             console.error('An error occurred during authentication:', error);
         }

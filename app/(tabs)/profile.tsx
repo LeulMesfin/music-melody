@@ -1,25 +1,45 @@
 import { Text, View, H1, YStack, H2, Avatar, XStack, Button } from 'tamagui'
 import React from 'react'
+import { tokenHook } from 'app/tokenHook';
+import { useEmailContext } from 'app/components/EmailComponent';
+
+/* task:
+ * store the user's spotify id into the db for id, change the data model
+ * make a GET to spotify web api to get the id, then send a get request to express api 
+ * to delete a user with this id. */
 
 /* This function makes a DELETE request to my express API 
  * hosted on Vercel. This function will send a request to
  * the API which then communicates with the MongoDB database
  * to delete a specified user from the database. */
-async function deleteUser(data): Promise<any> {
+const deleteUser = async(data): Promise<any> => {
     try {
       const result = await fetch("https://music-app-api-sand.vercel.app/users", {
-        method: "POST", headers: {'Content-Type': 'application/json' }, body: JSON.stringify(data)
+        method: "DELETE", headers: {'Content-Type': 'application/json' }, body: JSON.stringify(data)
       });
       return await result.json();
     } catch (error) {
       console.error('Detailed error:', error);
-      console.error('Error name:', error.name);
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
+      throw error;
     }
   }
 
+  const getUser = async(userEmail: string): Promise<any> => {
+    try {
+      const result = await fetch(`https://music-app-api-sand.vercel.app/users/${userEmail}`, {
+        method: "GET", headers: {'Content-Type': 'application/json' }
+      });
+      return await result.json();
+    } catch (error) {
+      console.error('Detailed error:', error);
+      throw error;
+    }
+  }
+
+
 export default function ProfileScreen() {
+  const { email } = useEmailContext();
+  console.log("email in profile: ", email);
   return (
     <YStack f={1} gap="$12" pt="$7" ai="center">
         <XStack alignItems="center" space="$6">
