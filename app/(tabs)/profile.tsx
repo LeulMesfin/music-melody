@@ -6,7 +6,7 @@ import { useEmailContext } from 'app/components/EmailComponent';
  * make a GET to spotify web api to get the id, then send a get request to express api 
  * to delete a user with this id. */
 
-/* This function makes a DELETE request to my express API 
+/* This asynchronous function makes a DELETE request to my express API 
  * hosted on Vercel. This function will send a request to
  * the API which then communicates with the MongoDB database
  * to delete a specified user from the database. */
@@ -22,20 +22,22 @@ const deleteUser = async(data): Promise<any> => {
     }
   }
 
-  const getUser = async(userEmail: string): Promise<any> => {
-    try {
-      const result = await fetch(`https://music-app-api-sand.vercel.app/users/${userEmail}`, {
-        method: "GET", headers: {'Content-Type': 'application/json' }
-      });
-      return await result.json();
-    } catch (error) {
-      console.error('Detailed error:', error);
-      throw error;
-    }
+/* This asynchronous function makes a call to my Express API
+ * to fetch a user based on email. This function takes in
+ * a string and returns a Promise of type any. */
+const getUser = async(userEmail: string): Promise<any> => {
+  try {
+    const result = await fetch(`https://music-app-api-sand.vercel.app/users/${userEmail}`, {
+      method: "GET", headers: {'Content-Type': 'application/json' }
+    });
+    return await result.json();
+  } catch (error) {
+    console.error('Detailed error:', error);
+    throw error;
   }
+}
 
-
-export default function ProfileScreen() {
+const ProfileScreen = () => {
   const { email } = useEmailContext();
   console.log("email in profile: ", email);
   return (
@@ -62,7 +64,8 @@ export default function ProfileScreen() {
                 Log out
             </Button>
          </YStack>
-    </YStack>
-    
+    </YStack> 
   )
 }
+
+export default ProfileScreen;

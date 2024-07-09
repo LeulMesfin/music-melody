@@ -2,7 +2,7 @@ import { H2, XStack, YStack, Button } from 'tamagui'
 
 /* Genre screen */
 // named index because this page will be loaded initally as soon as a user authenticates
-export default function GenreScreen() {
+const GenreScreen = () => {
   return (
     <YStack f={1} ai="center" gap="$16" px="$10" pt="$5">
       <H2>Select a genre</H2>
@@ -28,3 +28,5 @@ export default function GenreScreen() {
     </YStack>
   )
 }
+
+export default GenreScreen;

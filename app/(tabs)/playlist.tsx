@@ -1,5 +1,6 @@
-import { Text, View, H1, YStack, H2 } from 'tamagui'
+import { YStack, H2 } from 'tamagui'
 
+/* Playlist screen */
 export default function PlaylistScreen() {
   return (
     <YStack f={1} ai="center" gap="$8" px="$10" pt="$5">

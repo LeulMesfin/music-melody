@@ -2,7 +2,8 @@ import { Tabs } from 'expo-router'
 import { useTheme } from 'tamagui'
 import { Sliders, Music, User } from '@tamagui/lucide-icons'
 
-export default function TabLayout() {
+/* Tab layout listing all the relevant screens of my tab */
+const TabLayout = () => {
   const theme = useTheme()
 
   return (
@@ -35,3 +36,5 @@ export default function TabLayout() {
     </Tabs>
   )
 }
+
+export default TabLayout;
