@@ -3,7 +3,6 @@ import { getToken, storeToken, deleteToken } from './tokenLayout';
 
 export const tokenHook = () => {
     const [token, setToken] = useState<string | null>(null);
-    const [email, setEmail] = useState<string>("");
 
     // as soon as page renders, get the token
     useEffect(() => {
@@ -31,3 +30,5 @@ export const tokenHook = () => {
 
     return { token, updateToken, clearToken, generateToken };
 }
+
+export { storeToken };

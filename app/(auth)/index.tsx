@@ -1,6 +1,4 @@
-import { Link, Tabs, Stack } from 'expo-router'
-import { Button, useTheme } from 'tamagui'
-import { Atom, AudioWaveform } from '@tamagui/lucide-icons'
+import { useTheme } from 'tamagui'
 import { router } from 'expo-router';
 import { SignInScreen } from './signIn';
 

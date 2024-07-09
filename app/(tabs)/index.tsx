@@ -1,6 +1,4 @@
-import { ExternalLink } from '@tamagui/lucide-icons'
-import { Anchor, H2, Paragraph, XStack, YStack, H4, Text, Button } from 'tamagui'
-import { ToastControl } from 'app/CurrentToast'
+import { H2, XStack, YStack, Button } from 'tamagui'
 
 /* Genre screen */
 // named index because this page will be loaded initally as soon as a user authenticates

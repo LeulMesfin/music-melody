@@ -1,6 +1,5 @@
 import { ExternalLink } from '@tamagui/lucide-icons'
 import { Anchor, H2, Paragraph, XStack, YStack, H4, Text, Button, Card, Image } from 'tamagui'
-import { ToastControl } from 'app/CurrentToast'
 import type { CardProps } from 'tamagui'
 
 /* Genre screen */

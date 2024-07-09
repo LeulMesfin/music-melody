@@ -4,7 +4,6 @@ import { useColorScheme } from 'react-native'
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native'
 import { useFonts } from 'expo-font'
 import { SplashScreen, Stack } from 'expo-router'
-import { Provider } from './Provider'
 import { TamaguiProvider } from 'tamagui'
 import { tamaguiConfig } from '../tamagui.config'
 import { EmailProvider } from './components/EmailComponent'
@@ -62,17 +61,4 @@ function RootLayoutNav() {
       <App />
     </EmailProvider>
   )
-  // const colorScheme = useColorScheme()
-
-  // return (
-  //   <TamaguiProvider config={tamaguiConfig} defaultTheme={colorScheme!}>
-  //     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-  //       <Stack>
-  //         <Stack.Screen name="(auth)/index" options={{ headerShown: false }} />
-  //         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-  //         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-  //       </Stack>
-  //     </ThemeProvider>
-  //   </TamaguiProvider>
-  // )
 }

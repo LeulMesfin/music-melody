@@ -1,6 +1,4 @@
-import { Text, View, H1, YStack, H2, Avatar, XStack, Button } from 'tamagui'
-import React from 'react'
-import { tokenHook } from 'app/tokenHook';
+import { YStack, Avatar, XStack, Button } from 'tamagui'
 import { useEmailContext } from 'app/components/EmailComponent';
 
 /* task:
