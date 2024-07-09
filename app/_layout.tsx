@@ -42,6 +42,7 @@ export default function RootLayout() {
 }
 
 function App() {
+  // Rendering the pages of my application: auth screen and all the tab screens
   const colorScheme = useColorScheme()
   return (
     <TamaguiProvider config={tamaguiConfig} defaultTheme={colorScheme!}>
@@ -49,7 +50,6 @@ function App() {
         <Stack>
           <Stack.Screen name="(auth)/index" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         </Stack>
       </ThemeProvider>
     </TamaguiProvider>
@@ -57,6 +57,7 @@ function App() {
 }
 function RootLayoutNav() {
   return (
+    // Passing emailProvider state to the app using a context
     <EmailProvider>
       <App />
     </EmailProvider>
