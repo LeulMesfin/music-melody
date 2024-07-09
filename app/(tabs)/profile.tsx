@@ -37,6 +37,11 @@ const getUser = async(userEmail: string): Promise<any> => {
   }
 }
 
+/* This function handles the functionality
+ * for the profile screen. A user should be able to
+ * clear their playlists, delete their account, and/or
+ * log out of their account. This function takes in no
+ * arguments and returns JSX markup. */
 const ProfileScreen = () => {
   const { email } = useEmailContext();
   console.log("email in profile: ", email);
