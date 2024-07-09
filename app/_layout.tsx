@@ -21,7 +21,7 @@ export const unstable_settings = {
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync()
 
-export default function RootLayout() {
+const RootLayout = () => {
   const [interLoaded, interError] = useFonts({
     Inter: require('@tamagui/font-inter/otf/Inter-Medium.otf'),
     InterBold: require('@tamagui/font-inter/otf/Inter-Bold.otf'),
@@ -41,7 +41,8 @@ export default function RootLayout() {
   return <RootLayoutNav />
 }
 
-function App() {
+
+const App = () => {
   // Rendering the pages of my application: auth screen and all the tab screens
   const colorScheme = useColorScheme()
   return (
@@ -55,7 +56,8 @@ function App() {
     </TamaguiProvider>
   )
 }
-function RootLayoutNav() {
+
+const RootLayoutNav = () => {
   return (
     // Passing emailProvider state to the app using a context
     <EmailProvider>
@@ -63,3 +65,5 @@ function RootLayoutNav() {
     </EmailProvider>
   )
 }
+
+export default RootLayout;

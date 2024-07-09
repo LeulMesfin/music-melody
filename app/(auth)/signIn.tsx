@@ -13,10 +13,11 @@ import { Platform } from 'react-native'; // can delete
 import { storeToken } from 'app/components/tokenHook';
 import { useEmailContext } from 'app/components/EmailComponent';
 
-/** simulate signin */
 
-/* This function makes a GET request to the Spotify Web API
- * It returns a logged in User's profile info. */
+/* This asynchronous function fetches a user from
+ * the Spotify Web API. The function takes in a string
+ * and returns a Promise of type Any. An error is thrown
+ * on failure. */
 async function fetchProfile(token: string): Promise<any> {
   try {
     const result = await fetch("https://api.spotify.com/v1/me", {
