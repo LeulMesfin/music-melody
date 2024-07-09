@@ -18,30 +18,29 @@ import { useEmailContext } from 'app/components/EmailComponent';
  * the Spotify Web API. The function takes in a string
  * and returns a Promise of type Any. An error is thrown
  * on failure. */
-async function fetchProfile(token: string): Promise<any> {
+const fetchProfile = async(token: string): Promise<any> => {
   try {
     const result = await fetch("https://api.spotify.com/v1/me", {
       method: "GET", headers: { Authorization: `Bearer ${token}` }
     });
     return await result.json();
   } catch (error) {
-    console.log('Error fetching user info:', error);
     throw error;
   }
 }
 
-/* This function makes a POST request to my express API 
- * hosted on Vercel. This function will send a request to
- * the API which then communicates with the MongoDB database
- * to insert a new user to the database. */
-async function postUser(data): Promise<any> {
+/* This asynchronous function sends a POST request to
+ * the music app api to an a endpoint which then posts a
+ * user to a MongoDB database. This function takes in a data
+ * argument of any type, and returns a Promise of any time.
+ * An error is thrown on error */
+const postUser =  async(data): Promise<any> => {
   try {
     const result = await fetch("https://music-app-api-sand.vercel.app/users", {
       method: "POST", headers: {'Content-Type': 'application/json' }, body: JSON.stringify(data)
     });
     return await result.json();
   } catch (error) {
-    console.error('Detailed error:', error);
     throw error;
   }
 }
@@ -56,11 +55,22 @@ const discovery = {
 };
   
 
-/** ------ EXAMPLE ------ */
-export function SignInScreen({ onSignIn }) {
+/* This function handles the sign in functionality
+ * of a user. This includes UI and SpotifyOAuth.
+ * This implementation of Auth uses the Implicit Grant Flow.
+ * According to the Spotify Web API: 
+ * "The implicit grant flow is carried out on the client side and it does not involve secret keys. 
+ * Thus, you do not need any server-side code to use it.", as a result I am authenticating
+ * on the front-end versus the back-end. Implicit grant has significant security flaws and
+ * it is advised to instead use PKCE flow when authenticating. I am using Implicit Flow 
+ * just to begin and will eventually modify my project to utilize PKCE flow.
+ * This function takes in a prop and returns JSX markup. 
+ * For more info: https://docs.expo.dev/guides/authentication/#improving-user-experience 
+ * https://developer.spotify.com/documentation/web-api/tutorials/code-flow*/
+export const SignInScreen = ({ onSignIn }) => {
   const { email, setEmail } = useEmailContext();
   
-  // spotify auth
+  // Auth request courtesy of Expo
   const [request, response, promptAsync] = useAuthRequest(
     {
       responseType: ResponseType.Token,
@@ -77,11 +87,8 @@ export function SignInScreen({ onSignIn }) {
 
     console.log('Redirect URI:', request?.redirectUri); // for testing
     
-    /* Implicit-flow: this method has inherent security risks,
-     * for better security, I can transition this to auth code with PKCE
-     *  more info: https://docs.expo.dev/guides/authentication/#improving-user-experience */
+    // Spotify auth
     const spotifyAuth = async () => {
-      console.log("Button is pressed - spotifyAuth function called");
         try {
           const res = await promptAsync();
           if (res && res.type === 'success') {
@@ -163,22 +170,5 @@ export function SignInScreen({ onSignIn }) {
         </View>
       </View>
     </FormCard>
-  )
-}
-
-
-
-// Swap for your own Link
-const Link = ({
-  href,
-  children,
-}: {
-  href: string
-  children: React.ReactNode
-}) => {
-  return (
-    <View href={href} tag="a">
-      {children}
-    </View>
   )
 }
